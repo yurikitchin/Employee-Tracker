@@ -28,3 +28,10 @@ CREATE TABLE employees (
   CONSTRAINT FK_eployeeManager FOREIGN KEY (manager_id)
   REFERENCES employees(id)
 );
+
+INSERT INTO department (department_name)
+VALUES ('Administration');
+INSERT INTO department (department_name)
+VALUES ("Front-end Development");
+INSERT INTO department (department_name)
+VALUES ("Back-end Development");
