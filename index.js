@@ -56,11 +56,15 @@ const connection = mysql.createConnection({
   async function addEmployee() {
       //create array of managers from database
       //combine first and last name to create choices, insert ID into new employee manager_id on table
-      const managersArray = await query (
+      const managersObject = await query (
          `SELECT first_name, last_name, id FROM employees where manager_id IS NULL`
       )
-      console.log(managersArray.first_name)
-
+      const optionsArray = managersObject.map((managerName) => ({
+          name:managerName.first_name + managerName.last_name,
+          value: managerName.id
+      }))
+      console.log(optionsArray)
+    
       const rolesArray = await query (
           `SELECT * FROM roles`
       )
