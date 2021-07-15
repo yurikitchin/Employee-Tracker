@@ -98,6 +98,10 @@ const connection = mysql.createConnection({
               choices: roleOpt
           }
       ])
+      .then(employeeData => {
+          console.log("Adding a new employee to database....\n")
+          console.log(employeeData)
+      })
   }
 
 
