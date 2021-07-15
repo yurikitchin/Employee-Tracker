@@ -101,17 +101,21 @@ const connection = mysql.createConnection({
       .then(employeeData => {
           console.log("Adding a new employee to database....\n")
         //   console.log(employeeData)
-         const addEmployee => await query (
-              `INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
-              VALUES ${employeeData}`,
+         async function insEmployee () { await query (
+              `INSERT INTO employees (first_name, last_name, role_id, manager_id)
+              VALUES ("${employeeData.first_name}", "${employeeData.last_name}", ${employeeData.role_id}, ${employeeData.manager_id})`,
               (err, res) => {
                   if (err) throw err;
                   console.log(`${res.affectedRows} Employee has been updated\n`)
+                  console.table(res)
+                  initPromt()
               }
           )
+          }
+          insEmployee()
       })
   }
-  //create async function to add employee to database
+
 
 
   initPromt()
