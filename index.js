@@ -2,6 +2,7 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const { promisify } = require("util");
+const { async } = require("rxjs");
 
 //creat connection
 const connection = mysql.createConnection({
@@ -135,7 +136,7 @@ async function viewEmployee() {
 
 //add update function
 //select employee from list of names
-// access database using the id
+// create async function to access database using the id
 // select field to update
 // update database
 // question update another field y/n
@@ -150,19 +151,64 @@ async function updateEmployee() {
         value: employee.id
     }))
 
+    const managersObject = await query(
+        `SELECT first_name, last_name, id FROM employees where manager_id IS NULL`
+      );
+      const manOpt = managersObject.map((managerName) => ({
+        name: managerName.first_name + " " + managerName.last_name,
+        value: managerName.id,
+      }));
+    
+      const rolesArray = await query(`SELECT * FROM roles`);
+    
+      const roleOpt = rolesArray.map((roles) => ({
+        name: roles.title,
+        value: roles.id,
+      }));
+
 
     inquirer
         .prompt([
             {
                 type: "list",
-                name: 'employees',
+                name: 'employee',
                 message: 'Please select an employee to update',
                 choices: empList
-            }
+            },
+            {
+                type:"confirm",
+                name:"roleConfirm",
+                message:"Do you want to update the role",
+            },
+            {
+                type: "list",
+                name: "role",
+                message: "Please select new role",
+                choices: roleOpt,
+                when: function (answers) {
+                    return answers.roleConfirm
+                }
+            },
+            {
+                type:"confirm",
+                name:"manConfirm",
+                message:"Do you want to update the Manager",
+            },
+            {
+                type: "list",
+                name: "manager",
+                message: "Please select new manager",
+                choices: manOpt,
+                when: function (answers) {
+                    return answers.manConfirm
+                }
+            },
+
         ])
-        .then((answer) => {
-            console.log(answer)
+        .then((answers) => {
+            console.log(answers)
         })
 }
+
 
 initPromt();
