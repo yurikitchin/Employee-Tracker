@@ -51,18 +51,20 @@ const connection = mysql.createConnection({
   }
 
   //Add employees function
-  //create array of managers from database
+  
   //creat array of roles from database
   async function addEmployee() {
+      //create array of managers from database
+      //combine first and last name to create choices, insert ID into new employee manager_id on table
       const managersArray = await query (
          `SELECT first_name, last_name, id FROM employees where manager_id IS NULL`
       )
-      console.log(managersArray)
+      console.log(managersArray.first_name)
 
       const rolesArray = await query (
           `SELECT * FROM roles`
       )
-      console.log(rolesArray)
+    //   console.log(rolesArray)
     //   inquirer.prompt([
     //       {
     //           type: "input",
