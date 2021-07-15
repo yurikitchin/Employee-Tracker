@@ -130,4 +130,18 @@ async function viewEmployee() {
   });
 }
 
+//add update function
+async function updateEmployee() {
+   const empArray = await query("SELECT * FROM employees", (err, res) => {
+        if (err) throw err;
+    })
+
+    const empList = empArray.map((employee) => ({
+        name: empArray.first_name + "" + empArray.last_name,
+        value: empArray.id
+    }))
+
+    console.log(empList)
+}
+
 initPromt();
