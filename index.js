@@ -2,6 +2,7 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const { promisify } = require("util");
+const { async } = require("rxjs");
 
 //creat connection
 const connection = mysql.createConnection({
@@ -38,63 +39,102 @@ function initPrompt() {
           Add();
           break;
         case "View":
-            View()
-            break;
+          View();
+          break;
         case "Update":
-            Update()
+          Update();
       }
     });
 }
 
 function Add() {
-  inquirer.prompt([
-    {
-      type: "list",
-      name: "add",
-      message: "what would you like to add?",
-      choices: ["Department", "Role", "Employee", "Back"],
-    },
-  ])
-  .then((res) => {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "add",
+        message: "what would you like to add?",
+        choices: ["Department", "Role", "Employee", "Back"],
+      },
+    ])
+    .then((res) => {
       switch (res.add) {
-          case "Department":
-              console.log("add department function goes here")
-              Add()
-              break;
+        case "Department":
+          console.log("add department function goes here");
+          addDept();
+          break;
         case "Role":
-            console.log("add role function goes here")
-            Add()
-            break;
+          console.log("add role function goes here");
+          Add();
+          break;
         case "Employee":
-            addEmployee()
-            break;
+          addEmployee();
+          break;
         case "Back":
-            initPrompt()
-            break;
+          initPrompt();
+          break;
       }
-  })
+    });
 }
 
 function View() {
-  inquirer.prompt([
-    {
-      type: "list",
-      name: "view",
-      message: "what would you like to view?",
-      choices: ["Department", "Role", "Employee", "Back"],
-    },
-  ]);
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "view",
+        message: "what would you like to view?",
+        choices: ["Department", "Role", "Employee", "Back"],
+      },
+    ])
+    .then((res) => {
+      switch (res.view) {
+        case "Department":
+          console.log("VIEW department function goes here");
+          View();
+          break;
+        case "Role":
+          console.log("View role function goes here");
+          View();
+          break;
+        case "Employee":
+          viewEmployee();
+          break;
+        case "Back":
+          initPrompt();
+          break;
+      }
+    });
 }
 
 function Update() {
-    inquirer.prompt([
-        {
-            type: "list",
-            name: "update",
-            message: "what would you like to update?",
-            choices: ["Department", "Role", "Employee", "Back"],
-          },
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "update",
+        message: "what would you like to update?",
+        choices: ["Department", "Role", "Employee", "Back"],
+      },
     ])
+    .then((res) => {
+      switch (res.update) {
+        case "Department":
+          console.log("Update department function goes here");
+          Update();
+          break;
+        case "Role":
+          console.log("Update role function goes here");
+          Update();
+          break;
+        case "Employee":
+          updateEmployee();
+          break;
+        case "Back":
+          initPrompt();
+          break;
+      }
+    });
 }
 
 // first prompt add, view update (bonus update employee manager, view employees by manage, delete department,role and employee)
@@ -127,6 +167,34 @@ function employeePromt() {
     });
 }
 
+//Add department function
+async function addDept() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "deptName",
+        message: "Please enter the name of your new department",
+      },
+    ])
+    .then((deptName) => {
+      console.log(deptName);
+      console.log("Adding your new department............");
+      async function deptDB() {
+        await query(
+          `INSERT INTO department (department_name) VALUES ('${deptName.deptName}')`,
+          (err, res) => {
+            if (err) throw err;
+            console.log(`${res.affectedRows} Employee has been updated\n`);
+            console.table(res);
+            initPrompt();
+          }
+        )
+        
+      }
+      deptDB();
+    });
+}
 //Add employees function
 async function addEmployee() {
   //create array of managers from database
@@ -195,18 +263,11 @@ async function viewEmployee() {
   await query("SELECT * FROM employees", (err, res) => {
     if (err) throw err;
     console.table(res);
-    initPromt();
+    initPrompt();
   });
 }
 
 //add update function
-//select employee from list of names
-// create async function to access database using the id
-// select field to update
-// update database
-// question update another field y/n
-// y = select field to update n= run init
-//
 async function updateEmployee() {
   const empArray = await query("SELECT * FROM employees");
 
@@ -286,6 +347,7 @@ async function updateEmployee() {
               if (err) throw err;
               console.log(`${res.affectedRows} Employee has been updated\n`);
               console.table(res);
+              initPrompt;
             }
           );
         }
