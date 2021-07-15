@@ -2,7 +2,6 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const { promisify } = require("util");
-const { async } = require("rxjs");
 
 //creat connection
 const connection = mysql.createConnection({
@@ -13,27 +12,93 @@ const connection = mysql.createConnection({
   database: "employee_trackerdb",
 });
 
-//   const afterConnection = () => {
-//     connection.query('SELECT * FROM employees', (err, res) => {
-//       if (err) throw err;
-//       console.log(res);
-//       connection.end();
-//     });
-//   };
 const query = promisify(connection.query).bind(connection);
 
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
-  // afterConnection()
   //connection.end();
 });
 
 //Add inquirer prompts
+//add initial prompt
+function initPrompt() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "initMenu",
+        message: "What would you like to do...\n",
+        choices: ["Add", "View", "Update"],
+      },
+    ])
+    .then((res) => {
+      switch (res.initMenu) {
+        case "Add":
+          Add();
+          break;
+        case "View":
+            View()
+            break;
+        case "Update":
+            Update()
+      }
+    });
+}
+
+function Add() {
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "add",
+      message: "what would you like to add?",
+      choices: ["Department", "Role", "Employee", "Back"],
+    },
+  ])
+  .then((res) => {
+      switch (res.add) {
+          case "Department":
+              console.log("add department function goes here")
+              Add()
+              break;
+        case "Role":
+            console.log("add role function goes here")
+            Add()
+            break;
+        case "Employee":
+            addEmployee()
+            break;
+        case "Back":
+            initPrompt()
+            break;
+      }
+  })
+}
+
+function View() {
+  inquirer.prompt([
+    {
+      type: "list",
+      name: "view",
+      message: "what would you like to view?",
+      choices: ["Department", "Role", "Employee", "Back"],
+    },
+  ]);
+}
+
+function Update() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "update",
+            message: "what would you like to update?",
+            choices: ["Department", "Role", "Employee", "Back"],
+          },
+    ])
+}
 
 // first prompt add, view update (bonus update employee manager, view employees by manage, delete department,role and employee)
-
-function initPromt() {
+function employeePromt() {
   inquirer
     .prompt([
       {
@@ -56,8 +121,8 @@ function initPromt() {
           viewEmployee();
           break;
         case "Update Employee Role's":
-            updateEmployee()
-            break;
+          updateEmployee();
+          break;
       }
     });
 }
@@ -117,7 +182,7 @@ async function addEmployee() {
             if (err) throw err;
             console.log(`${res.affectedRows} Employee has been updated\n`);
             console.table(res);
-            initPromt();
+            initPrompt();
           }
         );
       }
@@ -130,7 +195,7 @@ async function viewEmployee() {
   await query("SELECT * FROM employees", (err, res) => {
     if (err) throw err;
     console.table(res);
-    initPromt()
+    initPromt();
   });
 }
 
@@ -143,86 +208,91 @@ async function viewEmployee() {
 // y = select field to update n= run init
 //
 async function updateEmployee() {
-    
-    const empArray = await query("SELECT * FROM employees");
+  const empArray = await query("SELECT * FROM employees");
 
-    const empList = empArray.map((employee) => ({
-        name: employee.first_name + " " + employee.last_name,
-        value: employee.id
-    }))
+  const empList = empArray.map((employee) => ({
+    name: employee.first_name + " " + employee.last_name,
+    value: employee.id,
+  }));
 
-    const managersObject = await query(
-        `SELECT first_name, last_name, id FROM employees where manager_id IS NULL`
-      );
-      const manOpt = managersObject.map((managerName) => ({
-        name: managerName.first_name + " " + managerName.last_name,
-        value: managerName.id,
-      }));
-    
-      const rolesArray = await query(`SELECT * FROM roles`);
-    
-      const roleOpt = rolesArray.map((roles) => ({
-        name: roles.title,
-        value: roles.id,
-      }));
+  const managersObject = await query(
+    `SELECT first_name, last_name, id FROM employees where manager_id IS NULL`
+  );
+  const manOpt = managersObject.map((managerName) => ({
+    name: managerName.first_name + " " + managerName.last_name,
+    value: managerName.id,
+  }));
 
+  const rolesArray = await query(`SELECT * FROM roles`);
 
-    inquirer
-        .prompt([
-            {
-                type: "list",
-                name: 'employee',
-                message: 'Please select an employee to update',
-                choices: empList
-            },
-            {
-                type:"confirm",
-                name:"roleConfirm",
-                message:"Do you want to update the role",
-            },
-            {
-                type: "list",
-                name: "role",
-                message: "Please select new role",
-                choices: roleOpt,
-                when: function (answers) {
-                    return answers.roleConfirm
-                }
-            },
-            {
-                type:"confirm",
-                name:"manConfirm",
-                message:"Do you want to update the Manager",
-            },
-            {
-                type: "list",
-                name: "manager",
-                message: "Please select new manager",
-                choices: manOpt,
-                when: function (answers) {
-                    return answers.manConfirm
-                }
-            },
+  const roleOpt = rolesArray.map((roles) => ({
+    name: roles.title,
+    value: roles.id,
+  }));
 
-        ])
-        .then((answers) => {
-           console.log("this is role", answers.role)
-           console.log("this is manager", answers.manager )
-           console.log("this is employee", answers.employee)
-           
-            async function updateDB() {
-                await query(
-                    `UPDATE employees SET role_id = ${answers.role}, manager_id=${answers.manager} WHERE id=${answers.employee}`,
-                    (err, res) => {
-                        if (err) throw err;
-                        console.log(`${res.affectedRows} Employee has been updated\n`);
-                        console.table(res);
-                    }
-                )
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "employee",
+        message: "Please select an employee to update",
+        choices: empList,
+      },
+      {
+        type: "confirm",
+        name: "roleConfirm",
+        message: "Do you want to update the role",
+      },
+      {
+        type: "list",
+        name: "role",
+        message: "Please select new role",
+        choices: roleOpt,
+        when: function (answers) {
+          return answers.roleConfirm;
+        },
+      },
+      {
+        type: "confirm",
+        name: "manConfirm",
+        message: "Do you want to update the Manager",
+      },
+      {
+        type: "list",
+        name: "manager",
+        message: "Please select new manager",
+        choices: manOpt,
+        when: function (answers) {
+          return answers.manConfirm;
+        },
+      },
+    ])
+    .then((answers) => {
+      async function updateDB(answers) {
+        if (answers.role) {
+          await query(
+            `UPDATE employees SET role_id = ${answers.role} WHERE id=${answers.employee}`,
+            (err, res) => {
+              if (err) throw err;
+              console.log(`${res.affectedRows} Employee has been updated\n`);
+              console.table(res);
             }
-            updateDB()
-        })
+          );
+        }
+        if (answers.manager) {
+          await query(
+            `UPDATE employees SET manager_id=${answers.manager} WHERE id=${answers.employee}`,
+            (err, res) => {
+              if (err) throw err;
+              console.log(`${res.affectedRows} Employee has been updated\n`);
+              console.table(res);
+            }
+          );
+        }
+      }
+
+      updateDB(answers);
+    });
 }
 
-
-initPromt();
+initPrompt();
