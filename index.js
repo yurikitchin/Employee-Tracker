@@ -134,6 +134,13 @@ async function viewEmployee() {
 }
 
 //add update function
+//select employee from list of names
+// access database using the id
+// select field to update
+// update database
+// question update another field y/n
+// y = select field to update n= run init
+//
 async function updateEmployee() {
     
     const empArray = await query("SELECT * FROM employees");
@@ -153,6 +160,9 @@ async function updateEmployee() {
                 choices: empList
             }
         ])
+        .then((answer) => {
+            console.log(answer)
+        })
 }
 
 initPromt();
