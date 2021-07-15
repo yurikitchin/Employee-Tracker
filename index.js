@@ -69,7 +69,7 @@ const connection = mysql.createConnection({
       )
 
       const roleOpt = rolesArray.map((roles) => ({
-          role: roles.id,
+          name: roles.title,
           value: roles.id
       }))
     
