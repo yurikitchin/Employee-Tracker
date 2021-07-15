@@ -206,7 +206,21 @@ async function updateEmployee() {
 
         ])
         .then((answers) => {
-            console.log(answers)
+           console.log("this is role", answers.role)
+           console.log("this is manager", answers.manager )
+           console.log("this is employee", answers.employee)
+           
+            async function updateDB() {
+                await query(
+                    `UPDATE employees SET role_id = ${answers.role}, manager_id=${answers.manager} WHERE id=${answers.employee}`,
+                    (err, res) => {
+                        if (err) throw err;
+                        console.log(`${res.affectedRows} Employee has been updated\n`);
+                        console.table(res);
+                    }
+                )
+            }
+            updateDB()
         })
 }
 
