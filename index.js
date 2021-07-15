@@ -54,6 +54,9 @@ function initPromt() {
         case "View Employee's":
           viewEmployee();
           break;
+        case "Update Employee Role's":
+            updateEmployee()
+            break;
       }
     });
 }
@@ -132,16 +135,24 @@ async function viewEmployee() {
 
 //add update function
 async function updateEmployee() {
-   const empArray = await query("SELECT * FROM employees", (err, res) => {
-        if (err) throw err;
-    })
+    
+    const empArray = await query("SELECT * FROM employees");
 
     const empList = empArray.map((employee) => ({
-        name: empArray.first_name + "" + empArray.last_name,
-        value: empArray.id
+        name: employee.first_name + " " + employee.last_name,
+        value: employee.id
     }))
 
-    console.log(empList)
+
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                name: 'employees',
+                message: 'Please select an employee to update',
+                choices: empList
+            }
+        ])
 }
 
 initPromt();
