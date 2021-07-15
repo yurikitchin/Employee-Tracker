@@ -60,7 +60,7 @@ const connection = mysql.createConnection({
          `SELECT first_name, last_name, id FROM employees where manager_id IS NULL`
       )
       const optionsArray = managersObject.map((managerName) => ({
-          name:managerName.first_name + managerName.last_name,
+          name:managerName.first_name + " " + managerName.last_name,
           value: managerName.id
       }))
       console.log(optionsArray)
@@ -68,19 +68,25 @@ const connection = mysql.createConnection({
       const rolesArray = await query (
           `SELECT * FROM roles`
       )
-    //   console.log(rolesArray)
-    //   inquirer.prompt([
-    //       {
-    //           type: "input",
-    //           name: "fName",
-    //           message: "Please enter employee's first name"
-    //       },
-    //       {
-    //           type: 'input',
-    //           name: "lName",
-    //           message: "Please enter employee's last name"
-    //       }
-    //   ])
+      console.log(rolesArray)
+      inquirer.prompt([
+          {
+              type: "input",
+              name: "fName",
+              message: "Please enter employee's first name"
+          },
+          {
+              type: 'input',
+              name: "lName",
+              message: "Please enter employee's last name"
+          },
+          {
+              type: "list",
+              name: "managerSelect",
+              message: "Please select employee Manager",
+              choices: optionsArray
+          }
+      ])
   }
 
 
