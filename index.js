@@ -77,32 +77,41 @@ const connection = mysql.createConnection({
       inquirer.prompt([
           {
               type: "input",
-              name: "fName",
+              name: "first_name",
               message: "Please enter employee's first name"
           },
           {
               type: 'input',
-              name: "lName",
+              name: "last_name",
               message: "Please enter employee's last name"
           },
           {
-              type: "list",
-              name: "managerSelect",
-              message: "Please select employee Manager",
-              choices: manOpt
+            type: "list",
+            name: "role_id",
+            message: "Please select Employee Role",
+            choices: roleOpt
           },
           {
               type: "list",
-              name: "rolesSelect",
-              message: "Please select Employee Role",
-              choices: roleOpt
+              name: "manager_id",
+              message: "Please select employee Manager",
+              choices: manOpt
           }
       ])
       .then(employeeData => {
           console.log("Adding a new employee to database....\n")
-          console.log(employeeData)
+        //   console.log(employeeData)
+         const addEmployee => await query (
+              `INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
+              VALUES ${employeeData}`,
+              (err, res) => {
+                  if (err) throw err;
+                  console.log(`${res.affectedRows} Employee has been updated\n`)
+              }
+          )
       })
   }
+  //create async function to add employee to database
 
 
   initPromt()
