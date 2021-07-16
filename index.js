@@ -2,7 +2,6 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const { promisify } = require("util");
-const { async } = require("rxjs");
 
 //creat connection
 const connection = mysql.createConnection({
@@ -17,20 +16,29 @@ const query = promisify(connection.query).bind(connection);
 
 connection.connect((err) => {
   if (err) throw err;
-  console.log(`connected as id ${connection.threadId}`);
-  //connection.end();
 });
 
 //Add inquirer prompts
 //add initial prompt
 function initPrompt() {
+  console.log(
+    `____________________________________________________________________
+    
+
+    
+                       Welcom to the Employee Tracker
+                       
+                       
+      ____________________________________________________________________`
+    
+  )
   inquirer
     .prompt([
       {
         type: "list",
         name: "initMenu",
         message: "What would you like to do...\n",
-        choices: ["Add", "View", "Update"],
+        choices: ["Add", "View", "Update Employee", "Quit"],
       },
     ])
     .then((res) => {
@@ -41,8 +49,12 @@ function initPrompt() {
         case "View":
           View();
           break;
-        case "Update":
-          Update();
+        case "Update Employee":
+          updateEmployee();
+          break;
+        case "Quit":
+          console.log("Thank you for using the Employee tracker.........")
+          connection.end();
       }
     });
 }
@@ -108,38 +120,6 @@ function View() {
       }
     });
 }
-
-function Update() {
-  inquirer
-    .prompt([
-      {
-        type: "list",
-        name: "update",
-        message: "what would you like to update?",
-        choices: ["Department", "Role", "Employee", "Back"],
-      },
-    ])
-    .then((res) => {
-      switch (res.update) {
-        case "Department":
-          console.log("Update department function goes here");
-          Update();
-          break;
-        case "Role":
-          console.log("Update role function goes here");
-          Update();
-          break;
-        case "Employee":
-          updateEmployee();
-          break;
-        case "Back":
-          initPrompt();
-          break;
-      }
-    });
-}
-
-// first prompt add, view update (bonus update employee manager, view employees by manage, delete department,role and employee)
 
 
 //Add department function
@@ -284,7 +264,7 @@ async function addEmployee() {
 
 //view employee's function
 async function viewEmployee() {
-  await query("SELECT * FROM employees", (err, res) => {
+  await query(`SELECT Emp.id as ID, concat(Emp.first_name, " ", Emp.last_name) as Employee, roles.title as Role, roles.salary as Salary, department.department_name as Department, concat(Mgr.first_name, " ", Mgr.last_name) as Manager FROM employees Emp INNER JOIN employees Mgr ON Emp.manager_id = Mgr.id INNER JOIN roles ON Emp.role_id=roles.id INNER JOIN department ON roles.department_id=department.id`, (err, res) => {
     if (err) throw err;
     console.table(res);
     initPrompt();
@@ -379,6 +359,7 @@ async function updateEmployee() {
               if (err) throw err;
               console.log(`${res.affectedRows} Employee has been updated\n`);
               console.table(res);
+              initPrompt()
             }
           );
         }
@@ -389,9 +370,12 @@ async function updateEmployee() {
               if (err) throw err;
               console.log(`${res.affectedRows} Employee has been updated\n`);
               console.table(res);
-              initPrompt;
+              initPrompt()
             }
           );
+        }
+        if (!answers.manager && !answers.role){ 
+          initPrompt()
         }
       }
 

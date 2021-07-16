@@ -1,0 +1,25 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "employee-tracker",
+  "main": "index.js",
+  "dependencies": {
+    "inquirer": "^8.1.1",
+    "mysql2": "^2.2.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yurikitchin/Employee-Tracker.git"
+  },
+  "author": "Yuri Kitchin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yurikitchin/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/yurikitchin/Employee-Tracker#readme"
+}
