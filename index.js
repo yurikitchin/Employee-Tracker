@@ -65,7 +65,7 @@ function Add() {
           break;
         case "Role":
           console.log("add role function goes here");
-          Add();
+          addRole()            ;
           break;
         case "Employee":
           addEmployee();
@@ -185,7 +185,7 @@ async function addDept() {
           `INSERT INTO department (department_name) VALUES ('${deptName.deptName}')`,
           (err, res) => {
             if (err) throw err;
-            console.log(`${res.affectedRows} Employee has been updated\n`);
+            console.log(`${res.affectedRows} department has been added\n`);
             console.table(res);
             initPrompt();
           }
@@ -195,6 +195,41 @@ async function addDept() {
       deptDB();
     });
 }
+
+//Add Role function
+async function addRole() {
+    const departments = await query( `SELECT department_name, id FROM department`)
+
+    const deptOpt = departments.map((deptName) => ({
+        name: deptName.department_name,
+        value: deptName.id
+    }))
+    inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "title",
+        message: "Please enter the title of your new role",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "Please enter the salary of your new role",
+      },
+      {
+        type: "list",
+        name: "department",
+        message: "Please select the department for your new role",
+        choices: deptOpt
+      }
+    ])
+    .then((answers) => {
+        console.log("Adding your new employee role............")
+        console.log(answers)
+    })
+
+}
+
 //Add employees function
 async function addEmployee() {
   //create array of managers from database
