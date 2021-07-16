@@ -47,6 +47,7 @@ function initPrompt() {
     });
 }
 
+//Prompts to add department, employee or role
 function Add() {
   inquirer
     .prompt([
@@ -77,6 +78,7 @@ function Add() {
     });
 }
 
+//prompts to view department, employee or role
 function View() {
   inquirer
     .prompt([
@@ -138,34 +140,7 @@ function Update() {
 }
 
 // first prompt add, view update (bonus update employee manager, view employees by manage, delete department,role and employee)
-function employeePromt() {
-  inquirer
-    .prompt([
-      {
-        type: "list",
-        name: "initMenu",
-        message: "What would you like to do...\n",
-        choices: [
-          "Add Employee's",
-          "View Employee's",
-          "Update Employee Role's",
-        ],
-      },
-    ])
-    .then((res) => {
-      switch (res.initMenu) {
-        case "Add Employee's":
-          addEmployee();
-          break;
-        case "View Employee's":
-          viewEmployee();
-          break;
-        case "Update Employee Role's":
-          updateEmployee();
-          break;
-      }
-    });
-}
+
 
 //Add department function
 async function addDept() {
@@ -226,6 +201,20 @@ async function addRole() {
     .then((answers) => {
         console.log("Adding your new employee role............")
         console.log(answers)
+        async function newRoleDB() {
+          await query(
+            `INSERT INTO roles (title, salary, department_id)  
+            VALUES ('${answers.title}', '${answers.salary}', ${answers.department})`,
+            (err, res) => {
+              if (err) throw err;
+              console.log(`${res.affectedRows} department has been added\n`);
+              console.table(res);
+              initPrompt();
+            }
+          )
+          
+        }
+        newRoleDB();
     })
 
 }
@@ -301,6 +290,9 @@ async function viewEmployee() {
     initPrompt();
   });
 }
+
+//View department function
+async function viewDept
 
 //add update function
 async function updateEmployee() {
