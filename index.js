@@ -93,11 +93,11 @@ function View() {
       switch (res.view) {
         case "Department":
           console.log("VIEW department function goes here");
-          View();
+          viewDept();
           break;
         case "Role":
           console.log("View role function goes here");
-          View();
+          viewRole();
           break;
         case "Employee":
           viewEmployee();
@@ -292,7 +292,22 @@ async function viewEmployee() {
 }
 
 //View department function
-async function viewDept
+async function viewDept() {
+  await query (`SELECT * FROM department`, (err, res) => {
+    if (err) throw err;
+    console.table(res)
+    initPrompt()
+  })
+}
+
+//View role Function
+async function viewRole() {
+  await query (`SELECT * FROM roles`, (err, res) => {
+    if (err) throw err;
+    console.table(res)
+    initPrompt()
+  })
+}
 
 //add update function
 async function updateEmployee() {
