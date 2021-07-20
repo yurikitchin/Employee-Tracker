@@ -264,8 +264,9 @@ async function addEmployee() {
 
 //view employee's function
 async function viewEmployee() {
-  await query(`SELECT Emp.id as ID, concat(Emp.first_name, " ", Emp.last_name) as Employee, roles.title as Role, roles.salary as Salary, department.department_name as Department, concat(Mgr.first_name, " ", Mgr.last_name) as Manager FROM employees Emp INNER JOIN employees Mgr ON Emp.manager_id = Mgr.id INNER JOIN roles ON Emp.role_id=roles.id INNER JOIN department ON roles.department_id=department.id`, (err, res) => {
+  await query(`SELECT Emp.id as ID, concat(Emp.first_name, " ", Emp.last_name) as Employee, roles.title as Role, roles.salary as Salary, department.department_name as Department, emp.manager_id as Manager FROM employees Emp INNER JOIN roles ON Emp.role_id=roles.id INNER JOIN department ON roles.department_id=department.id WHERE emp.manager_id IS NULL UNION SELECT Emp.id as ID, concat(Emp.first_name, " ", Emp.last_name) as Employee, roles.title as Role, roles.salary as Salary, department.department_name as Department, concat(Mgr.first_name, " ", Mgr.last_name) as Manager FROM employees Emp INNER JOIN employees Mgr ON Emp.manager_id = Mgr.id INNER JOIN roles ON Emp.role_id=roles.id INNER JOIN department ON roles.department_id=department.id`, (err, res) => {
     if (err) throw err;
+    console.log(res)
     console.table(res);
     initPrompt();
   });
